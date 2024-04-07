@@ -47,9 +47,3 @@ func (cfg *apiConfig) handleMetrics(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(fmt.Sprintf("Hits: %d", cfg.fileserverHits)))
 }
-
-func (cfg *apiConfig) handleReset(w http.ResponseWriter, _ *http.Request) {
-	cfg.fileserverHits = 0
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Hits reset to 0"))
-}

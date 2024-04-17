@@ -1,10 +1,14 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/SazedWorldbringer/chirpy/internal/utils"
+)
 
 func handleReadiness(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))
 		return
 	}
 	w.Header().Add("Content-Type", "text/plain; charset=utf-8")

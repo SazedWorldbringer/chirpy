@@ -3,11 +3,13 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/SazedWorldbringer/chirpy/internal/utils"
 )
 
 func validateChirpHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))
 		return
 	}
 	type chirp struct {
@@ -18,7 +20,7 @@ func validateChirpHandler(w http.ResponseWriter, r *http.Request) {
 	body := chirp{}
 	err := decoder.Decode(&body)
 	if err != nil {
-		http.Error(w, "Error decoding params: "+err.Error(), http.StatusBadRequest)
+		utils.RespondWithError(w, http.StatusBadRequest, "Error decoding params: "+err.Error())
 		return
 	}
 
@@ -27,14 +29,7 @@ func validateChirpHandler(w http.ResponseWriter, r *http.Request) {
 			Error string `json:"error"`
 		}
 		errResp := ErrorResp{Error: "Chirp is too long"}
-		jsonResp, err := json.Marshal(errResp)
-		if err != nil {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
-		}
-		w.Header().Add("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(jsonResp)
+		utils.RespondWithJSON(w, http.StatusBadRequest, errResp)
 		return
 	}
 
@@ -42,12 +37,5 @@ func validateChirpHandler(w http.ResponseWriter, r *http.Request) {
 		Valid bool `json:"valid"`
 	}
 	validResp := ValidResp{Valid: true}
-	jsonResp, err := json.Marshal(validResp)
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write(jsonResp)
+	utils.RespondWithJSON(w, http.StatusOK, validResp)
 }

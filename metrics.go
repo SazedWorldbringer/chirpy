@@ -3,11 +3,13 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/SazedWorldbringer/chirpy/internal/utils"
 )
 
 func (cfg *apiConfig) handleMetrics(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		utils.RespondWithError(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed))
 		return
 	}
 	w.Header().Add("Content-Type", "text/html; charset=utf-8")

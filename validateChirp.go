@@ -3,9 +3,32 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/SazedWorldbringer/chirpy/internal/utils"
 )
+
+func rmProfane(chirp string) string {
+	profaneWords := []string{"kerfuffle", "sharbert", "fornax"}
+	words := strings.Fields(chirp)
+
+	wordsToReplace := make(map[string]string)
+	for _, word := range profaneWords {
+		wordsToReplace[word] = "****"
+	}
+
+	modifiedWords := []string{}
+	for _, word := range words {
+		lowercaseWord := strings.ToLower(word)
+		if replacement, ok := wordsToReplace[lowercaseWord]; ok {
+			modifiedWords = append(modifiedWords, replacement)
+		} else {
+			modifiedWords = append(modifiedWords, word)
+		}
+	}
+
+	return strings.Join(modifiedWords, " ")
+}
 
 func validateChirpHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -33,9 +56,11 @@ func validateChirpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	type ValidResp struct {
-		Valid bool `json:"valid"`
+	cleanedChirp := rmProfane(body.Chirp)
+
+	type CleanedResp struct {
+		CleanedBody string `json:"cleaned_body"`
 	}
-	validResp := ValidResp{Valid: true}
+	validResp := CleanedResp{CleanedBody: cleanedChirp}
 	utils.RespondWithJSON(w, http.StatusOK, validResp)
 }
